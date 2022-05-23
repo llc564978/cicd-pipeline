@@ -1,0 +1,54 @@
+
+.dev:
+  variables:
+    ENV: dev
+
+.production:
+  variables:
+    ENV: prod
+
+stages:
+  - test
+  - build
+  - deploy
+  - extra
+
+test:
+  stage: test
+  script:
+    - flask test
+
+dev:build:
+  stage: build
+  extends: .dev
+  script:
+    - docker build github.com/gothinkster/flask-realworld-example-app --build-arg=$ENV
+    - docker push gothinkster/flask-realworld-example-app
+
+dev:deploy:
+  stage: deploy
+  extends: .dev
+  dependencies:
+    - build
+  script:
+    - kubectl apply -f k8s/$ENV
+
+production:build:
+  stage: build
+  extends: .production
+  script:
+    - docker build github.com/gothinkster/flask-realworld-example-app --build-arg=$ENV
+    - docker push gothinkster/flask-realworld-example-app
+
+production:deploy:
+  stage: deploy
+  extends: .production
+  dependencies:
+    - build
+  script:
+    - kubectl apply -f k8s/$ENV
+
+extra:
+  stage: extra
+  script:
+    - flask shell

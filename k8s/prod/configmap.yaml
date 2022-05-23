@@ -1,0 +1,7 @@
+apiVersion: v1
+data:
+  FLASK_APP: $FLASK_APP
+  FLASK_DEBUG: $FLASK_DEBUG
+kind: ConfigMap
+metadata:
+  name: app

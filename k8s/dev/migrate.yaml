@@ -1,0 +1,32 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: app
+spec:
+  selector:
+    matchLabels:
+      app: app
+  template:
+    metadata:
+      labels:
+        app: app
+    spec:
+      containers:
+        - name: app
+          image: gothinkster/flask-realworld-example-app:latest
+          envFrom:
+            - configMapRef:
+              name: app
+            - secretRef:
+              name: app
+          ports:
+            - name: web
+              containerPort: 80
+              protocol: TCP
+          command:
+            - /bin/sh
+            - -c
+          args:
+            - flask db init;
+            - flask db migrate;
+            - flask db upgrade;
